@@ -260,10 +260,12 @@ const getEpisodes = ($: cheerio.Root, variantId: string) => {
     .toArray()
     .map((item) => {
       const episodeId = $(item).find("a").attr("href")!.split("/").slice(-2).join("/");
+      const title = $(item).find(".seasonEpisodeTitle strong").text();
+      const altTitle = $(item).find(".seasonEpisodeTitle span").text();
 
       return {
         id: `${episodeId}/${variantId}`,
-        title: $(item).find(".seasonEpisodeTitle strong").text(),
+        title: title || altTitle,
         thumbnail: undefined, // TODO
         number: parseInt($(item).attr("data-episode-season-id")!),
         tags: [],
