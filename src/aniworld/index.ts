@@ -24,6 +24,11 @@ import {
 
 import * as cheerio from "cheerio";
 
+type ItemToFetch = {
+    playlist: Playlist,
+    promise: Promise<(string | undefined)[]>
+}
+
 export default class AniWorld extends SourceModule implements VideoContent {
   static BASE_URL = "https://aniworld.to";
   static AJAX_URL = "https://aniworld.to/ajax";
@@ -40,6 +45,8 @@ export default class AniWorld extends SourceModule implements VideoContent {
     return [];
   }
 
+
+
   async search(query: SearchQuery): Promise<Paging<Playlist>> {
     const response = await request.post(`${AniWorld.AJAX_URL}/search`, {
       headers: {
@@ -49,32 +56,37 @@ export default class AniWorld extends SourceModule implements VideoContent {
     });
 
     const data = response.json<AJAXSearchResult[]>();
-    let items: Playlist[] = [];
+    let items: ItemToFetch[] = []
 
     for (const item of data) {
       if (!item.link.startsWith("/anime/stream/")) continue;
 
       const playlistId = item.link.split("/")[3];
-      if (items.find((item) => item.id === playlistId)) continue;
-
-      const [posterImage, bannerImage] = await getImages(playlistId);
+      if (items.find((item) => item.playlist.id === playlistId)) continue;
 
       items.push({
-        id: playlistId,
-        title: item.title.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&"),
-        posterImage,
-        bannerImage,
-        url: `${AniWorld.BASE_URL}/anime/stream/${playlistId}`,
-        status: PlaylistStatus.unknown,
-        type: PlaylistType.video,
-      });
+        promise: getImages(playlistId),
+        playlist: {
+          id: playlistId,
+          title: item.title.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&"),
+          url: `${AniWorld.BASE_URL}/anime/stream/${playlistId}`,
+          status: PlaylistStatus.unknown,
+          type: PlaylistType.video,
+      }});
     }
 
+    const playlists: Playlist[] = []
+    for (const item of items) {
+      const itemPlaylist = item.playlist;
+      [itemPlaylist.posterImage, itemPlaylist.bannerImage] = await item.promise;
+      playlists.push(itemPlaylist);
+    }
+    
     return {
       id: "",
       nextPage: undefined,
       previousPage: undefined,
-      items,
+      items: playlists,
     };
   }
 
