@@ -45,8 +45,6 @@ export default class AniWorld extends SourceModule implements VideoContent {
     return [];
   }
 
-
-
   async search(query: SearchQuery): Promise<Paging<Playlist>> {
     const response = await request.post(`${AniWorld.AJAX_URL}/search`, {
       headers: {
@@ -56,7 +54,7 @@ export default class AniWorld extends SourceModule implements VideoContent {
     });
 
     const data = response.json<AJAXSearchResult[]>();
-    let items: ItemToFetch[] = []
+    let items: ItemToFetch[] = [];
 
     for (const item of data) {
       if (!item.link.startsWith("/anime/stream/")) continue;
@@ -72,16 +70,17 @@ export default class AniWorld extends SourceModule implements VideoContent {
           url: `${AniWorld.BASE_URL}/anime/stream/${playlistId}`,
           status: PlaylistStatus.unknown,
           type: PlaylistType.video,
-      }});
+        },
+      });
     }
 
-    const playlists: Playlist[] = []
+    const playlists: Playlist[] = [];
     for (const item of items) {
       const itemPlaylist = item.playlist;
       [itemPlaylist.posterImage, itemPlaylist.bannerImage] = await item.promise;
       playlists.push(itemPlaylist);
     }
-    
+
     return {
       id: "",
       nextPage: undefined,
