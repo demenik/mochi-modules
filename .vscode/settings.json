@@ -1,0 +1,10 @@
+{
+  "emeraldwalk.runonsave": {
+    "commands": [
+      {
+        "match": "src/.*",
+        "cmd": "python3 bump_version.py ${relativeFile}"
+      }
+    ]
+  }
+}
