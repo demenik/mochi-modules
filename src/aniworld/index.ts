@@ -39,7 +39,7 @@ export default class AniWorld extends SourceModule implements VideoContent {
     name: "AniWorld",
     description: "Module to watch anime from AniWorld",
     icon: `${AniWorld.BASE_URL}/favicon.ico`,
-    version: "1.0.0",
+    version: "1.0.1",
   };
 
   async searchFilters(): Promise<SearchFilter[]> {
@@ -206,16 +206,16 @@ export default class AniWorld extends SourceModule implements VideoContent {
 
     if (!Object.keys(extractors).includes(serverId)) throw new Error("Invalid server");
 
-    const { m3u8Url, subtitles } = await extract(
+    const m3u8url = await extract(
       `${AniWorld.BASE_URL}/redirect/${redirectId}`,
       serverId as ExtractorId
     );
 
-    const links = await getM3u8Qualities(m3u8Url);
+    const links = await getM3u8Qualities(m3u8url);
 
     return {
       links,
-      subtitles,
+      subtitles: [],
       skipTimes: [],
       headers: {},
     };

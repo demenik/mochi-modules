@@ -1,15 +1,10 @@
 import { voe } from "./voe";
 
-export const extractors: Record<string, (url: string) => Promise<ExtractResult>> = {
+export const extractors: Record<string, (url: string) => Promise<string>> = {
   voe,
 };
 
 export type ExtractorId = keyof typeof extractors;
-
-export type ExtractResult = {
-  m3u8Url: string;
-  subtitles: never[];
-};
 
 export function extract(url: string, provider: ExtractorId) {
   const extractor = extractors[provider];
