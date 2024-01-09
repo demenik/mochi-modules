@@ -39,7 +39,7 @@ export default class AniWorld extends SourceModule implements VideoContent {
     name: "AniWorld",
     description: "Module to watch anime from AniWorld",
     icon: `${AniWorld.BASE_URL}/favicon.ico`,
-    version: "1.0.2",
+    version: "1.1.0",
   };
 
   async searchFilters(): Promise<SearchFilter[]> {
@@ -73,7 +73,7 @@ export default class AniWorld extends SourceModule implements VideoContent {
         return {
           id,
           title: cheerio.load(item.title)(":root").text(),
-          url: item.link,
+          url: `${AniWorld.BASE_URL}${item.link}`,
           posterImage,
           bannerImage,
           status: PlaylistStatus.unknown,
