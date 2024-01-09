@@ -22,7 +22,7 @@ import { getUrlInfo, getPlaylistImages, convertPosterSize } from "./utils";
 import * as cheerio from "cheerio";
 import { scrapeAvailableLanguages, scrapeGenres, scrapeGroups, scrapeSynopsis } from "./scraper";
 import { ExtractorId, extract, extractors } from "$shared/extractors";
-import { getM3u8Qualities } from "$shared/utils/m3u8";
+import { getM3u8Qualities } from "$shared/utils";
 
 export default class AniWorld extends SourceModule implements VideoContent {
   static BASE_URL = "https://aniworld.to";
@@ -39,7 +39,7 @@ export default class AniWorld extends SourceModule implements VideoContent {
     name: "AniWorld",
     description: "Module to watch anime from AniWorld",
     icon: `${AniWorld.BASE_URL}/favicon.ico`,
-    version: "1.0.1",
+    version: "1.0.2",
   };
 
   async searchFilters(): Promise<SearchFilter[]> {
