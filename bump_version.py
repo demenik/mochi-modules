@@ -6,10 +6,12 @@ if len(sys.argv) != 2:
     print("Usage: python3 bump_version.py <file_edited>")
     sys.exit(1)
 
-module = re.match(r"src\/[^/]+\/", sys.argv[1]).group(0)
+match = re.match(r"src\/([^/]+)\/", sys.argv[1])
+path = match.group(0)
+module = match.group(1)
 
-if not os.path.exists(module + "index.ts"):
-    print(f"{module}/index.ts not found")
+if not os.path.exists(path + "index.ts"):
+    print(f"{path}/index.ts not found")
     sys.exit(2)
 
 
@@ -31,4 +33,17 @@ def update_version(file_path):
         f.write(content)
 
 
-update_version(module + "index.ts")
+def cache_version(file_path, module):
+    if os.path.exists(f"version-{module}.txt"):
+        return
+
+    with open(file_path, "r") as f:
+        content = f.read()
+
+    version = re.search(r'version: "(\d+\.\d+\.\d+)"', content).group(1)
+    with open(f"version-{module}.txt", "w") as f:
+        f.write(version)
+
+
+cache_version(path + "index.ts", module)
+update_version(path + "index.ts")
