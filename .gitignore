@@ -16,3 +16,6 @@ dist/
 
 node_modules/
 .DS_Store
+
+# reset_versions.py
+version-*.txt
