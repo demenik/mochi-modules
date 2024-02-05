@@ -24,8 +24,12 @@ import { scrapeAvailableLanguages, scrapeGenres, scrapeGroups, scrapeSynopsis } 
 import { ExtractorId, extract, extractors } from "$shared/extractors";
 import { getM3u8Qualities } from "$shared/utils";
 
+// very ugly hack to change BASE_URL
+// this is needed bc mochi js implementation cannot read class properties
+// pls fix erik :-(
+let BASE_URL = "https://aniworld.to";
+
 export default class AniWorld extends SourceModule implements VideoContent {
-  static BASE_URL = "https://aniworld.to";
   static LANGUAGES = new Map(
     Object.entries({
       german: "GerDub",
@@ -38,16 +42,21 @@ export default class AniWorld extends SourceModule implements VideoContent {
     id: "aniworld",
     name: "AniWorld",
     description: "Module to watch anime from AniWorld",
-    icon: `${AniWorld.BASE_URL}/favicon.ico`,
-    version: "1.1.0",
+    icon: `${BASE_URL}/favicon.ico`,
+    version: "1.1.1",
   };
+
+  constructor(baseUrl?: string) {
+    super();
+    BASE_URL = baseUrl || "https://aniworld.to";
+  }
 
   async searchFilters(): Promise<SearchFilter[]> {
     return [];
   }
 
   async search(query: SearchQuery): Promise<Paging<Playlist>> {
-    const response = await request.post(`${AniWorld.BASE_URL}/ajax/search`, {
+    const response = await request.post(`${BASE_URL}/ajax/search`, {
       body: `keyword=${query.query}`,
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -73,7 +82,7 @@ export default class AniWorld extends SourceModule implements VideoContent {
         return {
           id,
           title: cheerio.load(item.title)(":root").text(),
-          url: `${AniWorld.BASE_URL}${item.link}`,
+          url: `${BASE_URL}${item.link}`,
           posterImage,
           bannerImage,
           status: PlaylistStatus.unknown,
@@ -88,7 +97,9 @@ export default class AniWorld extends SourceModule implements VideoContent {
   }
 
   async discoverListings(): Promise<DiscoverListing[]> {
-    const response = await request.get(`${AniWorld.BASE_URL}`);
+    console.log(BASE_URL);
+
+    const response = await request.get(`${BASE_URL}`);
     const $ = cheerio.load(response.text());
 
     const carousels = $(".carousel:not(.animeNews)")
@@ -109,11 +120,11 @@ export default class AniWorld extends SourceModule implements VideoContent {
                   id: $(a).attr("href")!.split("/").at(-1)!,
                   title: $(a).find("h3").text(),
                   posterImage: convertPosterSize(
-                    `${AniWorld.BASE_URL}${$(a).find("img").attr("data-src")!}`,
+                    `${BASE_URL}${$(a).find("img").attr("data-src")!}`,
                     220
                   ),
                   bannerImage: undefined,
-                  url: `${AniWorld.BASE_URL}${$(a).attr("href")}`,
+                  url: `${BASE_URL}${$(a).attr("href")}`,
                   status: PlaylistStatus.unknown,
                   type: PlaylistType.video,
                 } satisfies Playlist;
@@ -126,7 +137,7 @@ export default class AniWorld extends SourceModule implements VideoContent {
   }
 
   async playlistDetails(id: string): Promise<PlaylistDetails> {
-    const response = await request.get(`${AniWorld.BASE_URL}/anime/stream/${id}`);
+    const response = await request.get(`${BASE_URL}/anime/stream/${id}`);
     const $ = cheerio.load(response.text());
 
     let yearReleased;
@@ -154,9 +165,7 @@ export default class AniWorld extends SourceModule implements VideoContent {
   ): Promise<PlaylistItemsResponse> {
     const groupId = options?.groupId || "";
 
-    const response = await request.get(
-      `${AniWorld.BASE_URL}/anime/stream/${playlistId}/${groupId}`
-    );
+    const response = await request.get(`${BASE_URL}/anime/stream/${playlistId}/${groupId}`);
     const $ = cheerio.load(response.text());
 
     return scrapeGroups($);
@@ -169,7 +178,7 @@ export default class AniWorld extends SourceModule implements VideoContent {
     const [groupId, episodeId, variantId] = _episodeId.split("/");
 
     const response = await request.get(
-      `${AniWorld.BASE_URL}/anime/stream/${playlistId}/${groupId}/${episodeId}`
+      `${BASE_URL}/anime/stream/${playlistId}/${groupId}/${episodeId}`
     );
     const $ = cheerio.load(response.text());
 
@@ -206,10 +215,7 @@ export default class AniWorld extends SourceModule implements VideoContent {
 
     if (!Object.keys(extractors).includes(serverId)) throw new Error("Invalid server");
 
-    const m3u8url = await extract(
-      `${AniWorld.BASE_URL}/redirect/${redirectId}`,
-      serverId as ExtractorId
-    );
+    const m3u8url = await extract(`${BASE_URL}/redirect/${redirectId}`, serverId as ExtractorId);
 
     const links = await getM3u8Qualities(m3u8url);
 
