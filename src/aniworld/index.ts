@@ -18,7 +18,7 @@ import {
   SourceModule,
   VideoContent,
 } from "@mochiapp/js";
-import { getUrlInfo, getPlaylistImages, convertPosterSize } from "./utils";
+import { getUrlInfo, getPlaylistImages, convertPosterSize, sanitizeHtml } from "./utils";
 import * as cheerio from "cheerio";
 import { scrapeAvailableLanguages, scrapeGenres, scrapeGroups, scrapeSynopsis } from "./scraper";
 import { ExtractorId, extract, extractors } from "$shared/extractors";
@@ -81,7 +81,7 @@ export default class AniWorld extends SourceModule implements VideoContent {
 
         return {
           id,
-          title: cheerio.load(item.title)(":root").text(),
+          title: sanitizeHtml(item.title),
           url: `${BASE_URL}${item.link}`,
           posterImage,
           bannerImage,
