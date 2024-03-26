@@ -40,7 +40,7 @@ export function scrapeGroups($: cheerio.Root) {
 }
 
 export function scrapeVariants($: cheerio.Root): PlaylistGroupVariant[] {
-  return $(".editFunctions:first > a > .flag")
+  return $(".editFunctions:first .flag")
     .toArray()
     .map((img) => {
       const id = $(img)
