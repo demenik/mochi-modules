@@ -1,10 +1,15 @@
 import { voe } from "./voe";
 
-export const extractors: Record<string, (url: string) => Promise<string>> = {
+export const extractors: Record<string, (url: string) => Promise<ExtractorResult>> = {
   voe,
 };
 
 export type ExtractorId = keyof typeof extractors;
+
+export type ExtractorResult = {
+  url: string;
+  headers?: Record<string, string>;
+};
 
 export function extract(url: string, provider: ExtractorId) {
   const extractor = extractors[provider];

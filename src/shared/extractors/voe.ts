@@ -1,5 +1,9 @@
-export async function voe(url: string): Promise<string> {
+import { ExtractorResult } from ".";
+
+export async function voe(url: string): Promise<ExtractorResult> {
   const response = await request.get(url);
 
-  return response.text().match(/'hls': '([^']+)'/)![1];
+  return {
+    url: response.text().match(/'hls': '([^']+)'/)![1],
+  };
 }

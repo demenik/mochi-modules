@@ -215,9 +215,9 @@ export default class AniWorld extends SourceModule implements VideoContent {
 
     if (!Object.keys(extractors).includes(serverId)) throw new Error("Invalid server");
 
-    const m3u8url = await extract(`${BASE_URL}/redirect/${redirectId}`, serverId as ExtractorId);
+    const { url } = await extract(`${BASE_URL}/redirect/${redirectId}`, serverId as ExtractorId);
 
-    const links = await getM3u8Qualities(m3u8url);
+    const links = await getM3u8Qualities(url);
 
     return {
       links,
