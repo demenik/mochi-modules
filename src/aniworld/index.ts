@@ -43,7 +43,7 @@ export default class AniWorld extends SourceModule implements VideoContent {
     name: "AniWorld",
     description: "Module to watch anime from AniWorld",
     icon: `${BASE_URL}/favicon.ico`,
-    version: "1.1.1",
+    version: "1.1.2",
   };
 
   constructor(baseUrl?: string) {
