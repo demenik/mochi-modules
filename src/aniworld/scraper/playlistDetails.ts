@@ -1,5 +1,8 @@
+import { sanitizeHtml } from "../utils";
+
 export function scrapeSynopsis($: cheerio.Root) {
-  const description = $("p.seri_des").attr("data-full-description");
+  const description = sanitizeHtml($("p.seri_des").attr("data-full-description") ?? "");
+
   const cast = $("div.cast > ul > li")
     .toArray()
     .map((li) => {
