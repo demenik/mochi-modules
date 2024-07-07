@@ -6,8 +6,9 @@ export async function voe(url: string): Promise<ExtractorResult> {
   const providerUrl = html.match(/window\.location\.href = '([^']*)'/)![1];
 
   const response = await request.get(providerUrl);
+  const hlsUrl = response.text().match(/prompt\("Node", "([^"]+)"\)/)![1];
 
   return {
-    url: response.text().match(/'hls': '([^']+)'/)![1],
+    url: hlsUrl,
   };
 }
